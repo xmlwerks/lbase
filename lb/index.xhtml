@@ -1,0 +1,910 @@
+<!DOCTYPE html [
+  <!ENTITY % HTMLlat1 PUBLIC
+    "-//W3C//ENTITIES Latin 1 for XHTML//EN"
+    "/xhtml-lat1.ent">
+  %HTMLlat1;
+  <!ENTITY % HTMLsymbol PUBLIC
+    "-//W3C//ENTITIES Symbols for XHTML//EN"
+    "/xhtml-symbol.ent">
+  %HTMLsymbol;
+  <!ENTITY % HTMLspecial PUBLIC 
+    "-//W3C//ENTITIES Special for XHTML//EN"
+    "/xhtml-special.ent">
+  %HTMLspecial;
+]>
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:lb="http://www.liquibase.org/xml/ns/dbchangelog"
+         xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext">
+
+<!-- a difference 
+xmlns:lb="http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+-->
+  
+	<xh:head>
+		<xh:title>Liquibase Change Editor</xh:title>
+
+		<xh:style type="text/css">
+table.clog td { padding: 0.3em; border: 1px solid black; }
+table.clog thead{ font-weight: bold; }
+table.xform td { padding: 0.3em; }
+.red { color: red; }
+.bold { font-weight: bold; }
+.change { border-bottom: 1px solid black; padding: 0.3em; }
+.pl { padding-left: 0.3em; }
+		</xh:style>
+
+		<xf:model id="main">
+<!--
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+-->
+
+			<xf:instance id="dbChangeLog" src="oxf:/lb/dbchangelog.xml"/>
+
+            <xf:instance id="download">
+                <serialized mediatype="application/xml" filename="changelog.xml"/>
+            </xf:instance>
+            <xf:bind ref="instance('download')" type="xs:base64Binary"
+                     calculate="saxon:string-to-base64Binary(saxon:serialize(instance('dbChangeLog'), 'xml'), 'UTF-8')"/>
+
+            <xf:instance id="upload">
+                <serialized mediatype="application/xml" filename="changelog.xml"/>
+            </xf:instance>
+            <xf:bind ref="instance('upload')" type="xs:base64Binary"/>
+
+            <xf:submission id="upload-submission" ref="instance('upload')" validate="false"
+                           relevant="false" method="post" replace="none" resource="echo:">
+                <xf:insert ev:event="xforms-submit-done" ref="instance('dbChangeLog')"
+                           origin="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary(instance('upload')), 'UTF-8'))"/>
+            </xf:submission>
+
+			<xf:instance id="changeSet-type">
+                <type>addAutoIncrement</type>
+			</xf:instance>
+
+            <xf:instance id="changeSet-index">
+                <index/>
+            </xf:instance>
+
+            <xf:instance id="changeSet-select-items" src="oxf:/lb/changeset-select.xml"/>
+
+            <xf:instance id="changeSet-templates" src="oxf:/lb/changeSet-templ.xml"/>
+
+            <xf:instance id="changeSet-templ">
+                <dbChangeLog/>
+            </xf:instance>
+            <xf:bind ref="instance('changeSet-templ')" calculate="instance('changeSet-templates')/changeSet[name(*) = instance('changeSet-type')]"/>
+
+ <!--
+
+            <xf:instance id="edit-addDefaultValue"><data/></xf:instance>
+            <xf:instance id="edit-addForeignKeyConstraint"><data/></xf:instance>
+            <xf:instance id="edit-addLookupTable"><data/></xf:instance>
+            <xf:instance id="edit-addNotNullConstraint"><data/></xf:instance>
+            <xf:instance id="edit-addPrimaryKey"><data/></xf:instance>
+            <xf:instance id="edit-alterSequence"><data/></xf:instance>
+            <xf:instance id="edit-createIndex"><data/></xf:instance>
+            <xf:instance id="edit-createProcedure"><data/></xf:instance>
+            <xf:instance id="edit-createSequence"><data/></xf:instance>
+            <xf:label>createView</xf:label>
+            <xf:value>customChange</xf:value>
+            <xf:value>delete</xf:value>
+            <xf:value>dropAllForeignKeyConstraint</xf:value>
+            <xf:value>dropColumn</xf:value>
+            <xf:value>dropDefaultValue</xf:value>
+            <xf:value>dropForeignKeyConstraint</xf:value>
+            <xf:value>dropColumn</xf:value>
+            <xf:value>dropDefaultValue</xf:value>
+            <xf:value>dropForeignKeyConstraint</xf:value>
+            <xf:value>dropIndex</xf:value>
+            <xf:value>dropNotNullConstraint</xf:value>
+            <xf:value>dropPrimaryKey</xf:value>
+            <xf:value>dropSequence</xf:value>
+            <xf:value>dropTable</xf:value>
+            <xf:value>dropUniqueConstraint</xf:value>
+            <xf:value>dropView</xf:value>
+            <xf:value>empty</xf:value>
+            <xf:value>executeCommand</xf:value>
+            <xf:value>insert</xf:value>
+            <xf:value>loadUpdateData</xf:value>
+            <xf:value>mergeColumns</xf:value>
+            <xf:value>modifyDataType</xf:value>
+            <xf:value>renameColumn</xf:value>
+            <xf:value>renameTable</xf:value>
+            <xf:value>renameView</xf:value>
+            <xf:value>sql</xf:value>
+            <xf:value>sqlFile</xf:value>
+            <xf:value>stop</xf:value>
+            <xf:value>tagDatabase</xf:value>
+            <xf:value>update</xf:value>
+  -->
+
+        </xf:model>
+
+	</xh:head>
+	
+	<xh:body>
+
+<!--
+        <xf:switch>
+
+            <xf:case id="case-none">
+                <xf:group>
+                    <xf:label>None</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-addColumn">
+                <xf:group>
+                    <xf:label>Add Column</xf:label>
+                    <xh:table class="xform">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="instance('edit-addColumn')/addColumn/@tableName">
+                                    <xf:label>Table Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="instance('edit-addColumn')/addColumn/column/@name">
+                                    <xf:label>Column Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="instance('edit-addColumn')/addColumn/column/@type">
+                                    <xf:label>Type:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:trigger>
+                                    <xf:label>Update</xf:label>
+                                    <xf:action ev:event="DOMActivate">
+                                        <xf:insert nodeset="changeSet[instance('changeSet-index')]/addColumn" at="1"
+                                                   position="before" origin="instance('edit-addColumn')/addColumn"/>
+                                        <xf:delete ref="changeSet[instance('changeSet-index')]/addColumn[2]"/>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-addDefaultValue">
+                <xf:group>
+                    <xf:label>Add Default Value</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-addForeignKeyConstraint">
+                <xf:group>
+                    <xf:label>AddForeignKeyConstraint</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-addLookupTable">
+                <xf:group>
+                    <xf:label>AddLookupTable</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-addNotNullConstraint">
+                <xf:group>
+                    <xf:label>Add Not Null Constraint</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-addPrimaryKey">
+                <xf:group>
+                    <xf:label>Add Primary Key</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-alterSequence">
+                <xf:group>
+                    <xf:label>alterSequence</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-createIndex">
+                <xf:group>
+                    <xf:label>Create Index</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-createProcedure">
+                <xf:group>
+                    <xf:label>Create Procedure</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-createSequence">
+                <xf:group>
+                    <xf:label>Create Sequence</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-createTable">
+                <xf:group>
+                    <xf:label>Create Table</xf:label>
+                    <p> </p>
+                </xf:group>
+            </xf:case>
+
+            <xf:case id="case-loadData">
+                <xf:group>
+                    <xf:label>Load Data</xf:label>
+                    <xh:table class="xform">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="instance('edit-loadData')/loadData/@catalogName">
+                                    <xf:label>Catalog Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="instance('edit-loadData')/loadData/@schemaName">
+                                    <xf:label>Schema Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="instance('edit-loadData')/loadData/@tableName">
+                                    <xf:label>Table Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="instance('edit-loadData')/loadData/@file">
+                                    <xf:label>File:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="instance('edit-loadData')/loadData/@separator">
+                                    <xf:label>Separator:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="instance('edit-loadData')/loadData/@quotchar">
+                                    <xf:label>Quote Character:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td colspan="2">
+                                &nbsp;
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td colspan="4">
+                                <xh:table class="clog">
+                                    <xh:thead>
+                                        <xh:tr>
+                                            <xh:td>index</xh:td>
+                                            <xh:td>header</xh:td>
+                                            <xh:td>name</xh:td>
+                                            <xh:td>defaultValue</xh:td>
+                                            <xh:td>defaultValueNumeric</xh:td>
+                                            <xh:td>defaultValueDate</xh:td>
+                                            <xh:td>defaultValueBoolean</xh:td>
+                                            <xh:td>defaultValueComputed</xh:td>
+                                        </xh:tr>
+                                    </xh:thead>
+                                    <xh:tbody>
+                                        <xh:tr>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td colspan="8">
+                                                <xf:trigger>
+                                                    <xf:label>Add Column</xf:label>
+                                                </xf:trigger>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </xh:tbody>
+                                </xh:table>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td colspan="4">
+                                <xf:trigger>
+                                    <xf:label>Update</xf:label>
+                                    <xf:action ev:event="DOMActivate">
+                                        <xf:insert nodeset="changeSet[instance('changeSet-index')]/loadData" at="1"
+                                                   position="before" origin="instance('edit-loadData')/loadData"/>
+                                        <xf:delete ref="changeSet[instance('changeSet-index')]/loadData[2]"/>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+
+					file="role_mappings.csv"
+					encoding="UTF-8"
+					separator=","
+					quotchar="&quot;"
+					<column index="" header="" name="" defaultValue=""
+							defaultValueNumeric="" defaultValueDate="" defaultValueBoolean=""
+							defaultValueComputed="" />
+
+                </xf:group>
+            </xf:case>
+
+        </xf:switch>
+
+        <xh:hr/>
+-->
+
+        <fr:tabview>
+
+            <fr:tab>
+                <fr:label>Upload</fr:label>
+                <xf:upload ref="instance('upload')">
+                    <xf:label>Select file:</xf:label>
+                    <xf:filename ref="@filename"/>
+                    <xf:mediatype ref="@mediatype"/>
+                    <xf:send ev:event="xforms-select" submission="upload-submission"/>
+                </xf:upload>
+
+                <xf:trigger>
+                    <xf:label>Process</xf:label>
+                    <xf:insert ev:event="DOMActivate" ref="instance('dbChangeLog')"
+                               origin="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary(instance('upload')), 'UTF-8'))"/>
+                </xf:trigger>
+
+            </fr:tab>
+
+            <fr:tab>
+                <fr:label>Preconditions</fr:label>
+                <xh:p>
+                    <xh:strong>runningAs:</xh:strong>
+                    <xf:input ref="/lb:databaseChangeLog/lb:preConditions/lb:runningAs/@username"/>
+                </xh:p>
+            </fr:tab>
+
+            <fr:tab>
+                <fr:label>Change Sets</fr:label>
+
+                <xh:div style="padding: 0.3em; border-bottom: 1px solid black">
+					<xh:span class="pl">
+                    <xf:trigger>
+                        <xf:label>+</xf:label>
+                        <xf:action ev:event="DOMActivate">
+                            <xf:var name="changeSetType" value="instance('changeSet-type')"/>
+                            <xf:var name="changeSetId" value="concat($changeSetType,'-',count(instance('dbChangeLog')/lb:changeSet[name(*) = $changeSetType])+1)"/>
+                            <xf:setvalue ref="instance('changeSet-templates')/changeSet[name(*) = $changeSetType]/@id" value="$changeSetId"/>
+                            <xf:insert context="instance('dbChangeLog')" nodeset="lb:changeSet" at="last()" position="after"
+                                       origin="instance('changeSet-templates')/lb:changeSet[name(*) = $changeSetType]"/>
+                        </xf:action>
+                    </xf:trigger>
+					</xh:span>
+					<xh:span class="pl">
+                    <xf:select1 ref="instance('changeSet-type')" appearance="minimal">
+                        <xf:itemset nodeset="instance('changeSet-select-items')/xf:item">
+                            <xf:label ref="xf:label"/>
+                            <xf:value ref="xf:value"/>
+                        </xf:itemset>
+                    </xf:select1>
+					</xh:span>
+                </xh:div>
+
+                <!-- outdent *************************************** -->
+
+<xf:repeat nodeset="lb:changeSet" id="change-sets">
+    <xh:div class="change">
+        <xf:var name="this" value="*"/>
+        <xf:var name="nameOf" value="name(*)"/>
+
+        <!--xh:p> position: <xf:output ref="position()"/>  index: <xf:output ref="index('change-sets')"/> repeat-position: <xf:output ref="xxf:repeat-position()"/> </xh:p-->
+
+        <xf:group ref=".[$nameOf = 'addLookupTable']">
+            <xf:switch>
+                <xf:case id="min-addLookupTable" selected="true">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>&gt;</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="full-addLookupTable"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Add Lookup Table - ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                </xf:case>
+                <xf:case id="full-addLookupTable">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>V</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="min-addLookupTable"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Add Lookup Table - ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:p>nada</xh:p>
+                </xf:case>
+            </xf:switch>
+        </xf:group>
+
+        <xf:group ref=".[$nameOf = 'addAutoIncrement']">
+            <xf:switch>
+                <xf:case id="min-addAutoIncrement" selected="true">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>&gt;</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="full-addAutoIncrement"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Auto Increment - ',$this/@columnName,' in ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                </xf:case>
+                <xf:case id="full-addAutoIncrement">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>V</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="min-addAutoIncrement"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Auto Increment - ',$this/@columnName,' in ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                    <!--
+                    <addAutoIncrement catalogName="catalog" schemaName="schema" tableName="table"
+                                      columnName="column"
+                                      columnDataType="type"
+                                      startWith="1"
+                                      incrementBy="1"/>
+                                      -->
+
+                    <xh:p>nada</xh:p>
+                </xf:case>
+            </xf:switch>
+        </xf:group>
+
+        <xf:group ref=".[$nameOf = 'addColumn']">
+            <xf:switch>
+                <xf:case id="min-addColumn" selected="true">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>&gt;</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="full-addColumn"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Add Column - ',$this/lb:column/@name,' to table ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                </xf:case>
+                <xf:case id="full-addColumn" selected="false">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>V</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="min-addColumn"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Add Column - ',$this/lb:column/@name,' to table ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:table class="xform">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="$this/@tableName">
+                                    <xf:label>Table Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="$this/column/@name">
+                                    <xf:label>Column Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="$this/column/@type">
+                                    <xf:label>Type:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:case>
+            </xf:switch>
+        </xf:group>
+
+        <xf:group ref=".[$nameOf = 'createTable']">
+            <xf:switch>
+                <xf:case id="min-createTable" selected="true">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>&gt;</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="full-createTable"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Create Table - ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                </xf:case>
+                <xf:case id="full-createTable" selected="false">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>V</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="min-createTable"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Create Table - ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:table class="xform">
+                        <xh:tr>
+                            <xh:td>
+                                <xh:table class="clog">
+                                    <xh:thead>
+                                        <xh:tr>
+                                            <xh:td>index</xh:td>
+                                            <xh:td>header</xh:td>
+                                            <xh:td>name</xh:td>
+                                            <xh:td>defaultValue</xh:td>
+                                            <xh:td>defaultValueNumeric</xh:td>
+                                            <xh:td>defaultValueDate</xh:td>
+                                            <xh:td>defaultValueBoolean</xh:td>
+                                            <xh:td>defaultValueComputed</xh:td>
+                                        </xh:tr>
+                                    </xh:thead>
+                                    <xh:tbody>
+                                        <xh:tr>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td colspan="8">
+                                                <xf:trigger>
+                                                    <xf:label>Add Column</xf:label>
+                                                </xf:trigger>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </xh:tbody>
+                                </xh:table>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:case>
+            </xf:switch>
+        </xf:group>
+
+        <xf:group ref=".[$nameOf = 'loadData']">
+            <xf:switch>
+                <xf:case id="min-loadData" selected="true">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>&gt;</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="full-loadData"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Load Data - To table ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                </xf:case>
+                <xf:case id="full-loadData" selected="false">
+                    <xh:span class="pl">
+                        <xf:trigger>
+                            <xf:label>V</xf:label>
+                            <xf:toggle ev:event="DOMActivate" case="min-loadData"/>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:input ref="@id"/>
+                    </xh:span>
+                    <xh:span class="pl">
+                        <xf:output value="concat('Load Data - To table ',$this/@tableName)"/>
+                    </xh:span>
+                    <xh:span style="float: right">
+                        <xf:trigger>
+                            <xf:label>X</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:delete context="instance('dbChangeLog')" nodeset="lb:changeSet"
+                                           at="index('change-sets')"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:span>
+                    <xh:span>
+                        <xh:span class="pl">
+                            <xf:input ref="$this/@catalogName">
+                                <xf:label>Catalog Name:</xf:label>
+                            </xf:input>
+                        </xh:span>
+                        <xh:span class="pl">
+                            <xf:input ref="$this/@schemaName">
+                                <xf:label>Schema Name:</xf:label>
+                            </xf:input>
+                        </xh:span>
+                        <xh:span class="pl">
+                            <xf:input ref="$this/@tableName">
+                                <xf:label>Table Name:</xf:label>
+                            </xf:input>
+                        </xh:span>
+                        <xh:span class="pl">
+                            <xf:input ref="$this/@file">
+                                <xf:label>File:</xf:label>
+                            </xf:input>
+                        </xh:span>
+                    </xh:span>
+                    <xh:table class="xform">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="$this/@catalogName">
+                                    <xf:label>Catalog Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="$this/@schemaName">
+                                    <xf:label>Schema Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="$this/@tableName">
+                                    <xf:label>Table Name:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="$this/@file">
+                                    <xf:label>File:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="$this/@separator">
+                                    <xf:label>Separator:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="$this/@quotchar">
+                                    <xf:label>Quote Character:</xf:label>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td colspan="2">
+                                &nbsp;
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td colspan="4">
+                                <xh:table class="clog">
+                                    <xh:thead>
+                                        <xh:tr>
+                                            <xh:td>index</xh:td>
+                                            <xh:td>header</xh:td>
+                                            <xh:td>name</xh:td>
+                                            <xh:td>defaultValue</xh:td>
+                                            <xh:td>defaultValueNumeric</xh:td>
+                                            <xh:td>defaultValueDate</xh:td>
+                                            <xh:td>defaultValueBoolean</xh:td>
+                                            <xh:td>defaultValueComputed</xh:td>
+                                        </xh:tr>
+                                    </xh:thead>
+                                    <xh:tbody>
+                                        <xh:tr>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td>  </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                            <xh:td> </xh:td>
+                                        </xh:tr>
+                                        <xh:tr>
+                                            <xh:td colspan="8">
+                                                <xf:trigger>
+                                                    <xf:label>Add Column</xf:label>
+                                                </xf:trigger>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </xh:tbody>
+                                </xh:table>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:case>
+            </xf:switch>
+        </xf:group>
+
+    </xh:div>
+</xf:repeat>
+
+<!--
+                    <xf:repeat nodeset="lb:changeSet" id="change-sets">
+                        <xh:tr>
+                            <xh:td>
+                                <xf:var name="thing" value="*"/>
+                                <xf:var name="nameOf" value="name(*)"/>
+                                <xf:trigger>
+                                    <xf:label>Edit</xf:label>
+                                    <xf:action ev:event="DOMActivate">
+                                        <xf:setvalue ref="instance('changeSet-index')" value="index('change-sets')" />
+                                        <xf:insert context="instance(concat('edit-',$nameOf))" at="1" position="before" origin="$thing"/>
+                                        <xf:delete ref="instance(concat('edit-',$nameOf))/*[2]"/>
+                                        <xf:toggle case="case-{$nameOf}"/>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xh:td>
+                            <xh:td><xf:input ref="@id"/></xh:td>
+                            <xh:td><xf:input ref="@author" /></xh:td>
+                            <xf:repeat nodeset="*">
+                                <xh:td><xh:strong><xf:output ref="name(.)"/></xh:strong></xh:td>
+                                <xh:td>
+                                    <xf:output ref="if (name(.) = 'addAutoIncrement') then concat(@tableName, ': ',columnName) else '' "/>
+                                    <xf:output ref="if (name(.) = 'addColumn') then concat(@tableName,': ', column/@name, ' as ', column/@type) else ''"/>
+                                    <xf:output ref="if (name(.) = 'createTable') then @tableName else ''"/>
+                                    <xf:output ref="if (name(.) = 'loadData') then concat(@tableName,': ',@file) else ''"/>
+                                </xh:td>
+                            </xf:repeat>
+                            <xh:td><xf:trigger appearance="minimal">
+                                <xf:label>X</xf:label>
+                                <xf:action ev:event="DOMActivate">
+                                    <xf:delete context="instance('dbChangeLog')" nodeset="changeSet" at="index('change-sets')"/>
+                                </xf:action>
+                            </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </xf:repeat>
+-->
+
+            </fr:tab>
+
+            <fr:tab>
+                <fr:label>Download</fr:label>
+                <xf:output ref="instance('download')" appearance="xxf:download">
+                    <xf:label>Download instance</xf:label>
+                    <xf:mediatype ref="@mediatype"/>
+                    <xf:filename ref="@filename"/>
+                </xf:output>
+            </fr:tab>
+
+        </fr:tabview>
+
+        <xh:hr/>
+
+		<!-- <xf:output ref="xxf:serialize( /, 'xml')"/> -->
+
+        <xh:hr/>
+
+        <fr:xforms-inspector />
+
+	</xh:body>
+	
+</xh:html>  

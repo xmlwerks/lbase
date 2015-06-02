@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ora="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	<preConditions>
+		<runningAs username="assist" />
+	</preConditions>
+
+	<changeSet id="changeSet-1" author="hratzesberger">
+		<createTable tableName="person">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="firstname" type="varchar(50)" />
+			<column name="lastname" type="varchar(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="state" type="char(2)" />
+		</createTable>
+	</changeSet>
+
+	<changeSet id="changeSet-2" author="hratzesberger">
+		<addColumn tableName="person">
+			<column name="username" type="varchar(8)" />
+		</addColumn>
+	</changeSet>
+	<changeSet id="changeSet-3" author="hratzesberger">
+		<addLookupTable existingTableName="person"
+			existingColumnName="state" newTableName="state" newColumnName="id"
+			newColumnDataType="char(2)" />
+	</changeSet>
+
+	<changeSet id="loadData" author="hratzesberger">
+		<loadData catalogName="" schemaName="assist" tableName="role_mapppings"
+			file="role_mappings.csv" encoding="UTF-8" separator="," quotchar="&quot;">
+			<column index="" header="" name="" defaultValue=""
+				defaultValueNumeric="" defaultValueDate="" defaultValueBoolean=""
+				defaultValueComputed="" />
+		</loadData>
+	</changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog">
+
+    <changeSet id="addAutoIncrement" author="nobody">
+        <addAutoIncrement catalogName="catalog" schemaName="schema" tableName="table"
+                          columnName="column"
+                          columnDataType="type"
+                          startWith="1"
+                          incrementBy="1"/>
+    </changeSet>
+
+    <changeSet id="addColumn" author="nobody">
+        <addColumn tableName="person">
+            <column name="username" type="varchar(8)" />
+        </addColumn>
+    </changeSet>
+
+    <!-- <xf:value>addDefaultValue</xf:value> -->
+
+    <!-- <xf:label>addForeignKeyConstraint</xf:label> -->
+
+    <changeSet id="addLookupTable" author="nobody">
+        <addLookupTable existingTableName="existing_table" existingColumnName="existing_column" newTableName="new_table" newColumnName="new_column" newColumnDataType="type"/>
+    </changeSet>
+
+    <!-- <xf:label>addNotNullConstraint</xf:label> -->
+
+    <!-- <xf:label>addPrimaryKey</xf:label> -->
+
+    <!-- <xf:label>alterSequence</xf:label> -->
+
+    <!-- <xf:label>createIndex</xf:label> -->
+
+    <!--     <xf:value>createProcedure</xf:value> -->
+    <!--     <xf:value>createSequence</xf:value> -->
+
+    <changeSet id="createTable" author="nobody">
+        <createTable tableName="person">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="firstname" type="varchar(50)" />
+            <column name="lastname" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="state" type="char(2)" />
+        </createTable>
+    </changeSet>
+
+    <!-- <xf:label>createView</xf:label> -->
+
+    <!-- <xf:value>customChange</xf:value> -->
+
+    <!-- <xf:value>delete</xf:value> -->
+
+    <!-- <xf:value>dropAllForeignKeyConstraint</xf:value> -->
+
+    <!-- <xf:value>dropColumn</xf:value> -->
+
+    <!-- <xf:value>dropDefaultValue</xf:value> -->
+
+    <!-- <xf:value>dropForeignKeyConstraint</xf:value> -->
+
+    <!--
+        <xf:value>dropColumn</xf:value>
+        <xf:value>dropDefaultValue</xf:value>
+        <xf:value>dropForeignKeyConstraint</xf:value>
+        <xf:value>dropIndex</xf:value>
+        <xf:value>dropNotNullConstraint</xf:value>
+        <xf:value>dropPrimaryKey</xf:value>
+        <xf:value>dropSequence</xf:value>
+        <xf:value>dropTable</xf:value>
+        <xf:value>dropUniqueConstraint</xf:value>
+        <xf:value>dropView</xf:value>
+        <xf:value>empty</xf:value>
+        <xf:value>executeCommand</xf:value>
+        <xf:value>insert</xf:value>
+-->
+
+    <changeSet id="loadData" author="nobody">
+        <loadData catalogName="" schemaName="assist" tableName="role_mapppings"
+                  file="role_mappings.csv" encoding="UTF-8" separator="," quotchar="&quot;">
+            <column index="" header="" name="" defaultValue=""
+                    defaultValueNumeric="" defaultValueDate="" defaultValueBoolean=""
+                    defaultValueComputed="" />
+        </loadData>
+    </changeSet>
+
+<!--
+        <xf:value>loadUpdateData</xf:value>
+        <xf:value>mergeColumns</xf:value>
+        <xf:value>modifyDataType</xf:value>
+        <xf:value>renameColumn</xf:value>
+        <xf:value>renameTable</xf:value>
+        <xf:value>renameView</xf:value>
+        <xf:value>sql</xf:value>
+        <xf:value>sqlFile</xf:value>
+        <xf:value>stop</xf:value>
+        <xf:value>tagDatabase</xf:value>
+        <xf:value>update</xf:value>
+-->
+
+</databaseChangeLog>
